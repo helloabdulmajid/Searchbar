@@ -1,43 +1,63 @@
+
 import React from "react";
 import { useState } from "react";
 import "../components/SearchBar.css";
-// import SearchIcon from '@mui/icons-material/Search';
+import { UilSearch } from "@iconscout/react-unicons";
+import { UilTimes } from '@iconscout/react-unicons'
 
-const SearchBar = ({ placeholder, data }) => {
-  const [filterWord, setFilterWord] = useState([]);
-  const [wordEntered, setWordEntered] = useState([]);
+function SearchBar({ placeholder, data }) {
+  const [filteredData, setFilteredData] = useState([]);
+  const [wordEntered, setWordEntered] = useState("");
 
-  const inputHandle = (e) => {
-    const searchWord = e.target.value;
+  const handleFilter = (event) => {
+    const searchWord = event.target.value;
     setWordEntered(searchWord);
+    const newFilter = data.filter((value) => {
+      return value.title.toLowerCase().includes(searchWord.toLowerCase());
+    });
+
+    if (searchWord === "") {
+      setFilteredData([]);
+    } else {
+      setFilteredData(newFilter);
+    }
   };
+
+  const clearInput = () => {
+    setFilteredData([]);
+    setWordEntered("");
+  };
+
   return (
-    <>
-      <div className="search">
-        <div className="searchInputs">
-          <input
-            type="text"
-            placeholder={placeholder}
-            value={wordEntered}
-            onChange={inputHandle}
-          />
-          <div className="searchIcon">
-            {/* <SearchIcon/> */}
-            search
-          </div>
+    <div className="search">
+      <div className="searchInputs">
+        <input
+          type="text"
+          placeholder={placeholder}
+          value={wordEntered}
+          onChange={handleFilter}
+        />
+        <div className="searchIcon">
+          {filteredData.length === 0 ? (
+            <UilSearch />
+          ) : (
+            <UilTimes id="clearBtn" onClick={clearInput} />
+          )}
         </div>
+      </div>
+      {filteredData.length !== 0 && (
         <div className="dataResult">
-          {data.map((value, key) => {
+          {filteredData.slice(0, 15).map((value, key) => {
             return (
-              <a className="dataItem" href={value.link} target="_blank">
+              <a className="dataItem" href={value.link} target="_blank"  rel="noreferrer">
                 <p>{value.title} </p>
               </a>
             );
           })}
         </div>
-      </div>
-    </>
+      )}
+    </div>
   );
-};
+}
 
 export default SearchBar;
